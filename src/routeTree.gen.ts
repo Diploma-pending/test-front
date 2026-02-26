@@ -10,43 +10,70 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ChatsChatIdRouteImport } from './routes/chats.$chatId'
+import { Route as GroupsGroupIdRouteImport } from './routes/groups.$groupId'
+import { Route as GroupsGroupIdIndexRouteImport } from './routes/groups.$groupId.index'
+import { Route as GroupsGroupIdChatsChatIdRouteImport } from './routes/groups.$groupId.chats.$chatId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ChatsChatIdRoute = ChatsChatIdRouteImport.update({
-  id: '/chats/$chatId',
-  path: '/chats/$chatId',
+const GroupsGroupIdRoute = GroupsGroupIdRouteImport.update({
+  id: '/groups/$groupId',
+  path: '/groups/$groupId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GroupsGroupIdIndexRoute = GroupsGroupIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => GroupsGroupIdRoute,
+} as any)
+const GroupsGroupIdChatsChatIdRoute =
+  GroupsGroupIdChatsChatIdRouteImport.update({
+    id: '/chats/$chatId',
+    path: '/chats/$chatId',
+    getParentRoute: () => GroupsGroupIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/chats/$chatId': typeof ChatsChatIdRoute
+  '/groups/$groupId': typeof GroupsGroupIdRouteWithChildren
+  '/groups/$groupId/': typeof GroupsGroupIdIndexRoute
+  '/groups/$groupId/chats/$chatId': typeof GroupsGroupIdChatsChatIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/chats/$chatId': typeof ChatsChatIdRoute
+  '/groups/$groupId': typeof GroupsGroupIdIndexRoute
+  '/groups/$groupId/chats/$chatId': typeof GroupsGroupIdChatsChatIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/chats/$chatId': typeof ChatsChatIdRoute
+  '/groups/$groupId': typeof GroupsGroupIdRouteWithChildren
+  '/groups/$groupId/': typeof GroupsGroupIdIndexRoute
+  '/groups/$groupId/chats/$chatId': typeof GroupsGroupIdChatsChatIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chats/$chatId'
+  fullPaths:
+    | '/'
+    | '/groups/$groupId'
+    | '/groups/$groupId/'
+    | '/groups/$groupId/chats/$chatId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chats/$chatId'
-  id: '__root__' | '/' | '/chats/$chatId'
+  to: '/' | '/groups/$groupId' | '/groups/$groupId/chats/$chatId'
+  id:
+    | '__root__'
+    | '/'
+    | '/groups/$groupId'
+    | '/groups/$groupId/'
+    | '/groups/$groupId/chats/$chatId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ChatsChatIdRoute: typeof ChatsChatIdRoute
+  GroupsGroupIdRoute: typeof GroupsGroupIdRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -58,19 +85,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/chats/$chatId': {
-      id: '/chats/$chatId'
-      path: '/chats/$chatId'
-      fullPath: '/chats/$chatId'
-      preLoaderRoute: typeof ChatsChatIdRouteImport
+    '/groups/$groupId': {
+      id: '/groups/$groupId'
+      path: '/groups/$groupId'
+      fullPath: '/groups/$groupId'
+      preLoaderRoute: typeof GroupsGroupIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/groups/$groupId/': {
+      id: '/groups/$groupId/'
+      path: '/'
+      fullPath: '/groups/$groupId/'
+      preLoaderRoute: typeof GroupsGroupIdIndexRouteImport
+      parentRoute: typeof GroupsGroupIdRoute
+    }
+    '/groups/$groupId/chats/$chatId': {
+      id: '/groups/$groupId/chats/$chatId'
+      path: '/chats/$chatId'
+      fullPath: '/groups/$groupId/chats/$chatId'
+      preLoaderRoute: typeof GroupsGroupIdChatsChatIdRouteImport
+      parentRoute: typeof GroupsGroupIdRoute
     }
   }
 }
 
+interface GroupsGroupIdRouteChildren {
+  GroupsGroupIdIndexRoute: typeof GroupsGroupIdIndexRoute
+  GroupsGroupIdChatsChatIdRoute: typeof GroupsGroupIdChatsChatIdRoute
+}
+
+const GroupsGroupIdRouteChildren: GroupsGroupIdRouteChildren = {
+  GroupsGroupIdIndexRoute: GroupsGroupIdIndexRoute,
+  GroupsGroupIdChatsChatIdRoute: GroupsGroupIdChatsChatIdRoute,
+}
+
+const GroupsGroupIdRouteWithChildren = GroupsGroupIdRoute._addFileChildren(
+  GroupsGroupIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ChatsChatIdRoute: ChatsChatIdRoute,
+  GroupsGroupIdRoute: GroupsGroupIdRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -10,7 +10,7 @@ export const AppHeader = () => (
         to="/"
         className="hover:text-foreground data-[status=active]:text-foreground data-[status=active]:font-semibold"
       >
-        All chats
+        Create group
       </Link>
     </nav>
   </header>
