@@ -9,6 +9,7 @@ import {
   getGroupChats,
   listBusinesses,
   triggerAnalysis,
+  triggerChatAnalysis,
 } from "@/shared/api/client"
 import type { GroupChatsResponse } from "@/shared/api/types"
 
@@ -54,6 +55,20 @@ export function useTriggerAnalysis(groupId: string) {
     mutationFn: () => triggerAnalysis(groupId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: groupChatsKey(groupId) })
+    },
+  })
+}
+
+export function useTriggerChatAnalysis(groupId: string, chatId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => triggerChatAnalysis(groupId, chatId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: groupChatsKey(groupId) })
+      queryClient.invalidateQueries({
+        queryKey: chatDetailKey(groupId, chatId),
+      })
     },
   })
 }

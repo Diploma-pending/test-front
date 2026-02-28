@@ -113,3 +113,18 @@ export async function getChatDetail(
 
   return handleResponse<ChatDetailResponse>(res)
 }
+
+export async function triggerChatAnalysis(
+  groupId: string,
+  chatId: string,
+): Promise<ChatDetailResponse> {
+  const res = await fetch(
+    `${API_BASE_URL}/groups/${groupId}/chats/${encodeURIComponent(chatId)}/analyze`,
+    {
+      method: "POST",
+      headers: NGROK_HEADERS,
+    },
+  )
+
+  return handleResponse<ChatDetailResponse>(res)
+}

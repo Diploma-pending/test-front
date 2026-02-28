@@ -2,7 +2,11 @@ import { Link } from "@tanstack/react-router"
 import { ApiError } from "@/shared/api/client"
 import { getChatDisplayName } from "@/shared/lib/utils"
 import { Button } from "@/shared/ui/button"
-import { useChatDetail, useGroupChats } from "@/features/groups/api/queries"
+import {
+  useChatDetail,
+  useGroupChats,
+  useTriggerChatAnalysis,
+} from "@/features/groups/api/queries"
 
 interface ChatDetailsPageProps {
   groupId: string
@@ -12,6 +16,7 @@ interface ChatDetailsPageProps {
 export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
   const { data: chat, isLoading, error } = useChatDetail(groupId, chatId)
   const { data: groupData } = useGroupChats(groupId)
+  const triggerChatAnalysis = useTriggerChatAnalysis(groupId, chatId)
   const chatIndex =
     groupData?.chats.findIndex((c) => c.chat_id === chatId) ?? -1
   const chatDisplayName =
@@ -107,11 +112,23 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
             </p>
           )}
         </div>
-        <Button asChild size="sm" variant="outline">
-          <Link to="/groups/$groupId" params={{ groupId }}>
-            Back to all chats
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          {(chat.status === "generated" || chat.status === "failed") && (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => triggerChatAnalysis.mutate()}
+              disabled={triggerChatAnalysis.isPending}
+            >
+              {triggerChatAnalysis.isPending ? "Starting…" : "Analyze chat"}
+            </Button>
+          )}
+          <Button asChild size="sm" variant="outline">
+            <Link to="/groups/$groupId" params={{ groupId }}>
+              Back to all chats
+            </Link>
+          </Button>
+        </div>
       </header>
 
       <div className="grid gap-4 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
