@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { useNavigate } from "@tanstack/react-router"
 import { Button } from "@/shared/ui/button"
+import { Input } from "@/shared/ui/input"
+import { Label } from "@/shared/ui/label"
 import {
   Select,
   SelectContent,
@@ -138,9 +140,7 @@ export const GroupCreateForm = () => {
 
       {contextMode === "preset" && (
         <div className="space-y-2">
-          <label htmlFor="business" className="block text-sm font-medium">
-            Business context
-          </label>
+          <Label htmlFor="business">Business context</Label>
           <Select
             value={selectedBusinessId}
             onValueChange={setSelectedBusinessId}
@@ -166,29 +166,26 @@ export const GroupCreateForm = () => {
       {contextMode === "custom" && (
         <>
           <div className="space-y-2">
-            <label htmlFor="context_file" className="block text-sm font-medium">
+            <Label htmlFor="context_file">
               Context file (.md, max 1 MB) — optional
-            </label>
-            <input
+            </Label>
+            <Input
               id="context_file"
               type="file"
               accept=".md"
               onChange={(e) => setContextFile(e.target.files?.[0] ?? null)}
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-secondary file:px-4 file:py-2 file:text-sm file:font-medium"
               disabled={createGroup.isPending}
+              className="cursor-pointer file:mr-4 file:rounded-md file:border-0 file:bg-secondary file:px-4 file:py-2 file:text-sm file:font-medium"
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="website_url" className="block text-sm font-medium">
-              Website URL — optional
-            </label>
-            <input
+            <Label htmlFor="website_url">Website URL — optional</Label>
+            <Input
               id="website_url"
               type="url"
               value={websiteUrl}
               onChange={(e) => setWebsiteUrl(e.target.value)}
               placeholder="https://example-shop.com"
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               disabled={createGroup.isPending}
             />
             <p className="text-xs text-muted-foreground">
@@ -199,16 +196,13 @@ export const GroupCreateForm = () => {
       )}
 
       <div className="space-y-2">
-        <label htmlFor="num_chats" className="block text-sm font-medium">
-          Number of chats
-        </label>
-        <input
+        <Label htmlFor="num_chats">Number of chats</Label>
+        <Input
           id="num_chats"
           type="number"
           min={1}
           value={numChats}
-          onChange={(e) => setNumChats(Number(e.target.value) || 8)}
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          onChange={(e) => setNumChats(Number(e.target.value))}
           disabled={createGroup.isPending}
         />
       </div>
