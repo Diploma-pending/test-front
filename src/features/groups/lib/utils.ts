@@ -32,6 +32,22 @@ export const formatGroupDate = (iso: string): string => {
   }
 }
 
+/** Formatted for list/card display: "Feb 28, 2025, 3:45 PM" */
+export const formatGroupDateList = (iso: string): string => {
+  try {
+    const d = new Date(iso)
+    return d.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    })
+  } catch {
+    return iso
+  }
+}
+
 export const isValidHttpUrl = (str: string): boolean => {
   try {
     const url = new URL(str)

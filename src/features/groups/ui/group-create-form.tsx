@@ -1,18 +1,15 @@
 import { useState } from "react"
 import { useNavigate } from "@tanstack/react-router"
+import { Building2, FileUp } from "lucide-react"
 import { Button } from "@/shared/ui/button"
 import { Input } from "@/shared/ui/input"
 import { Label } from "@/shared/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/ui/select"
+import { BusinessIcon } from "./business-icon"
+import { cn } from "@/shared/lib/styles"
 import { useBusinesses, useCreateGroup } from "../hooks/use-groups-queries"
 import { MAX_CONTEXT_FILE_SIZE_BYTES } from "../lib/constants"
 import { isValidHttpUrl } from "../lib/utils"
+import { ContextFileDropzone } from "./context-file-dropzone"
 
 type ContextMode = "preset" | "custom"
 
@@ -27,9 +24,17 @@ export const GroupCreateForm = () => {
   const [numChats, setNumChats] = useState(8)
   const [error, setError] = useState<string | null>(null)
 
+  const MAX_CHATS = 20
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+
+    const clampedChats = Math.min(MAX_CHATS, Math.max(1, numChats))
+    if (clampedChats !== numChats) {
+      setNumChats(clampedChats)
+      return
+    }
 
     if (contextMode === "preset") {
       if (!selectedBusinessId) {
@@ -100,51 +105,107 @@ export const GroupCreateForm = () => {
     <form onSubmit={onSubmit} className="flex flex-col gap-4 max-w-xl">
       <div className="space-y-2">
         <span className="block text-sm font-medium">Context</span>
-        <div className="flex gap-4">
-          <label className="flex items-center gap-2 cursor-pointer">
+        <div
+          className="grid gap-2 sm:grid-cols-2 sm:gap-3"
+          role="radiogroup"
+          aria-label="Context mode"
+        >
+          <label
+            className={cn(
+              "flex cursor-pointer flex-col gap-2 rounded-xl border-2 p-4 transition-all duration-200",
+              "hover:border-primary/40 hover:bg-secondary/40",
+              "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
+              contextMode === "preset"
+                ? "border-primary bg-primary/10"
+                : "border-border bg-card/50",
+              createGroup.isPending && "pointer-events-none opacity-60",
+            )}
+          >
             <input
               type="radio"
               name="context_mode"
+              value="preset"
               checked={contextMode === "preset"}
               onChange={() => setContextMode("preset")}
               disabled={createGroup.isPending}
-              className="rounded-full border-input"
+              className="sr-only"
             />
-            Preset business
+            <Building2 className="size-5 shrink-0 text-muted-foreground" />
+            <span className="font-medium">Preset business</span>
+            <span className="text-xs text-muted-foreground">
+              Use a Skelar portfolio context
+            </span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label
+            className={cn(
+              "flex cursor-pointer flex-col gap-2 rounded-xl border-2 p-4 transition-all duration-200",
+              "hover:border-primary/40 hover:bg-secondary/40",
+              "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
+              contextMode === "custom"
+                ? "border-primary bg-primary/10"
+                : "border-border bg-card/50",
+              createGroup.isPending && "pointer-events-none opacity-60",
+            )}
+          >
             <input
               type="radio"
               name="context_mode"
+              value="custom"
               checked={contextMode === "custom"}
               onChange={() => setContextMode("custom")}
               disabled={createGroup.isPending}
-              className="rounded-full border-input"
+              className="sr-only"
             />
-            Custom
+            <FileUp className="size-5 shrink-0 text-muted-foreground" />
+            <span className="font-medium">Custom</span>
+            <span className="text-xs text-muted-foreground">
+              Upload file or paste URL
+            </span>
           </label>
         </div>
       </div>
 
       {contextMode === "preset" && (
         <div className="space-y-2">
-          <Label htmlFor="business">Business context</Label>
-          <Select
-            value={selectedBusinessId}
-            onValueChange={setSelectedBusinessId}
-            disabled={createGroup.isPending || businessesLoading}
+          <span className="block text-sm font-medium">Business context</span>
+          <div
+            className="grid grid-cols-2 gap-3 sm:grid-cols-3"
+            role="radiogroup"
+            aria-label="Select a business context"
           >
-            <SelectTrigger id="business" className="w-full">
-              <SelectValue placeholder="Select a business…" />
-            </SelectTrigger>
-            <SelectContent>
-              {businesses.map((b) => (
-                <SelectItem key={b.id} value={b.id}>
-                  {b.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            {businesses.map((b) => {
+              const isChecked = selectedBusinessId === b.id
+              return (
+                <label
+                  key={b.id}
+                  className={cn(
+                    "flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-4 transition-all duration-200",
+                    "hover:border-primary/40 hover:bg-secondary/40",
+                    "focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background",
+                    isChecked
+                      ? "border-primary bg-primary/10"
+                      : "border-border bg-card/50",
+                    (createGroup.isPending || businessesLoading) &&
+                      "pointer-events-none opacity-60",
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name="business"
+                    value={b.id}
+                    checked={isChecked}
+                    onChange={() => setSelectedBusinessId(b.id)}
+                    disabled={createGroup.isPending || businessesLoading}
+                    className="sr-only"
+                  />
+                  <BusinessIcon id={b.id} className="size-8 shrink-0" />
+                  <span className="text-center text-sm font-medium">
+                    {b.label}
+                  </span>
+                </label>
+              )
+            })}
+          </div>
           <p className="text-xs text-muted-foreground">
             Use a preset context from the list (e.g. Brighterly, Dressly).
           </p>
@@ -153,19 +214,11 @@ export const GroupCreateForm = () => {
 
       {contextMode === "custom" && (
         <>
-          <div className="space-y-2">
-            <Label htmlFor="context_file">
-              Context file (.md, max 1 MB) — optional
-            </Label>
-            <Input
-              id="context_file"
-              type="file"
-              accept=".md"
-              onChange={(e) => setContextFile(e.target.files?.[0] ?? null)}
-              disabled={createGroup.isPending}
-              className="cursor-pointer file:mr-4 file:rounded-md file:border-0 file:bg-secondary file:px-4 file:py-2 file:text-sm file:font-medium"
-            />
-          </div>
+          <ContextFileDropzone
+            contextFile={contextFile}
+            setContextFile={setContextFile}
+            disabled={createGroup.isPending}
+          />
           <div className="space-y-2">
             <Label htmlFor="website_url">Website URL — optional</Label>
             <Input
@@ -184,13 +237,18 @@ export const GroupCreateForm = () => {
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="num_chats">Number of chats</Label>
+        <Label htmlFor="num_chats">Number of chats (1–{MAX_CHATS})</Label>
         <Input
           id="num_chats"
-          type="number"
           min={1}
+          max={MAX_CHATS}
           value={numChats}
-          onChange={(e) => setNumChats(Number(e.target.value))}
+          onChange={(e) => setNumChats(Number(e.target.value) || 0)}
+          onBlur={() =>
+            setNumChats((n) =>
+              Number.isNaN(n) || n < 1 ? 1 : Math.min(MAX_CHATS, n),
+            )
+          }
           disabled={createGroup.isPending}
         />
       </div>
