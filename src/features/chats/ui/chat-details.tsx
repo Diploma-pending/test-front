@@ -92,7 +92,7 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
               Messages not yet loaded.
             </p>
           ) : (
-            <div className="flex flex-col gap-3 rounded-lg bg-secondary/40 p-3 max-h-[520px] overflow-y-auto">
+            <div className="flex flex-col gap-3 rounded-lg bg-secondary/40 p-3 max-h-[calc(100vh-250px)] overflow-y-auto">
               {messages.map((message, index) => (
                 <div
                   key={index}
@@ -118,7 +118,7 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
           )}
         </div>
 
-        <aside className="flex flex-col gap-3 rounded-xl border border-border bg-card/80 p-4 text-sm shadow-sm">
+        <aside className="flex flex-col h-fit gap-3 rounded-xl border border-border bg-card/80 p-4 text-sm shadow-sm">
           <h2 className="text-sm font-semibold tracking-tight text-muted-foreground">
             Quality analysis
           </h2>

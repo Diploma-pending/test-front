@@ -1,4 +1,5 @@
 import type {
+  BusinessContextItem,
   ChatDetailResponse,
   CreateGroupResponse,
   GroupChatsResponse,
@@ -32,22 +33,25 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return body as T
 }
 
+export async function listBusinesses(): Promise<BusinessContextItem[]> {
+  const res = await fetch(`${API_BASE_URL}/groups/businesses`)
+  return handleResponse<BusinessContextItem[]>(res)
+}
+
 export async function createGroup(params: {
   topic: string
+  business?: string
   contextFile?: File
   websiteUrl?: string
   numChats?: number
 }): Promise<CreateGroupResponse> {
-  const { topic, contextFile, websiteUrl, numChats = 8 } = params
-
-  if (!contextFile && !websiteUrl) {
-    throw new Error(
-      "Provide at least one of: context_file (.md) or website_url",
-    )
-  }
+  const { topic, business, contextFile, websiteUrl, numChats = 8 } = params
 
   const form = new FormData()
   form.append("topic", topic)
+  if (business) {
+    form.append("business", business)
+  }
   if (contextFile) {
     form.append("context_file", contextFile, contextFile.name)
   }

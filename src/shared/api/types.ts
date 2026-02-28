@@ -1,3 +1,8 @@
+export interface BusinessContextItem {
+  id: string
+  label: string
+}
+
 export type GroupStatus =
   | "gathering_context"
   | "context_gathering_failed"

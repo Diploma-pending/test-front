@@ -7,6 +7,7 @@ import {
   createGroup,
   getChatDetail,
   getGroupChats,
+  listBusinesses,
   triggerAnalysis,
 } from "@/shared/api/client"
 import type { GroupChatsResponse } from "@/shared/api/types"
@@ -26,6 +27,13 @@ function shouldPoll(status: GroupChatsResponse["status"]) {
   return !TERMINAL_GROUP_STATUSES.includes(
     status as (typeof TERMINAL_GROUP_STATUSES)[number],
   )
+}
+
+export function useBusinesses() {
+  return useQuery({
+    queryKey: ["groups", "businesses"] as const,
+    queryFn: listBusinesses,
+  })
 }
 
 export function useCreateGroup() {
