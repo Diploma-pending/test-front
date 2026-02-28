@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router"
 import { ApiError } from "@/shared/api/client"
+import { getChatDisplayName } from "@/shared/lib/utils"
 import { Button } from "@/shared/ui/button"
 import { useGroupChats, useTriggerAnalysis } from "../api/queries"
 import type { GroupStatus } from "@/shared/api/types"
@@ -78,6 +79,9 @@ export const GroupChatsList = ({ groupId }: GroupChatsListProps) => {
     data.status === "generating" ||
     data.status === "analyzing"
 
+  const generatedCount = data.chats.filter(
+    (c) => c.status !== "pending" && c.status !== "generating",
+  ).length
   const analyzedCount = data.chats.filter(
     (c) => c.status === "analyzed" || c.status === "failed",
   ).length
@@ -114,7 +118,7 @@ export const GroupChatsList = ({ groupId }: GroupChatsListProps) => {
           {data.status === "gathering_context"
             ? "Fetching website and generating context document…"
             : data.status === "generating"
-              ? `Generating chats… ${data.chats.length} of ${data.num_chats} ready`
+              ? `Generating chats… ${generatedCount} of ${data.num_chats} ready`
               : `Analyzing… ${analyzedCount} of ${data.num_chats} done`}
         </div>
       )}
@@ -145,7 +149,7 @@ export const GroupChatsList = ({ groupId }: GroupChatsListProps) => {
                 : "No chats yet. Generation in progress…"}
             </li>
           ) : (
-            data.chats.map((chat) => (
+            data.chats.map((chat, index) => (
               <li key={chat.chat_id} className="group">
                 <Link
                   to="/groups/$groupId/chats/$chatId"
@@ -155,28 +159,27 @@ export const GroupChatsList = ({ groupId }: GroupChatsListProps) => {
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2">
                       <span className="rounded-full bg-primary/90 px-2.5 py-0.5 text-xs font-semibold text-primary-foreground shadow-sm">
-                        {chat.chat_id}
-                      </span>
-                      <span className="text-sm font-medium capitalize">
-                        {chat.case_type.replace(/_/g, " ")}
+                        {getChatDisplayName(index + 1)}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span className="rounded-full bg-secondary px-2 py-0.5">
                         {chat.status}
                       </span>
-                      {chat.analysis && (
-                        <span className="rounded-full bg-secondary px-2 py-0.5">
-                          score {chat.analysis.quality_score}/10
-                        </span>
-                      )}
+                      {chat.analysis &&
+                        typeof chat.analysis.quality_score === "number" && (
+                          <span className="rounded-full bg-secondary px-2 py-0.5">
+                            score {chat.analysis.quality_score}/10
+                          </span>
+                        )}
                     </div>
                   </div>
-                  {chat.analysis && (
-                    <p className="line-clamp-2 text-xs text-muted-foreground">
-                      {chat.analysis.reasoning}
-                    </p>
-                  )}
+                  {chat.analysis &&
+                    typeof chat.analysis.reasoning === "string" && (
+                      <p className="line-clamp-2 text-xs text-muted-foreground">
+                        {chat.analysis.reasoning}
+                      </p>
+                    )}
                 </Link>
               </li>
             ))

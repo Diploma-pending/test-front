@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router"
 import { ApiError } from "@/shared/api/client"
+import { getChatDisplayName } from "@/shared/lib/utils"
 import { Button } from "@/shared/ui/button"
-import { useChatDetail } from "@/features/groups/api/queries"
+import { useChatDetail, useGroupChats } from "@/features/groups/api/queries"
 
 interface ChatDetailsPageProps {
   groupId: string
@@ -10,6 +11,11 @@ interface ChatDetailsPageProps {
 
 export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
   const { data: chat, isLoading, error } = useChatDetail(groupId, chatId)
+  const { data: groupData } = useGroupChats(groupId)
+  const chatIndex =
+    groupData?.chats.findIndex((c) => c.chat_id === chatId) ?? -1
+  const chatDisplayName =
+    chatIndex >= 0 ? getChatDisplayName(chatIndex + 1) : `Chat ${chatId}`
 
   if (isLoading && !chat) {
     return (
@@ -65,13 +71,18 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
     )
   }
 
+  const analysis = chat.analysis as Record<string, unknown> | null | undefined
+  const scenario = analysis?.scenario as Record<string, unknown> | undefined
   const flags = [
-    chat.scenario?.has_hidden_dissatisfaction && "Hidden dissatisfaction",
-    chat.scenario?.has_tonal_errors && "Tonal errors",
-    chat.scenario?.has_logical_errors && "Logical errors",
+    scenario?.has_hidden_dissatisfaction && "Hidden dissatisfaction",
+    scenario?.has_tonal_errors && "Tonal errors",
+    scenario?.has_logical_errors && "Logical errors",
   ].filter(Boolean) as string[]
 
-  const messages = chat.messages ?? []
+  const messages = (chat.messages ?? []).filter(
+    (m): m is { role: "customer" | "agent"; text: string } =>
+      (m.role === "customer" || m.role === "agent") && typeof m.text === "string",
+  )
 
   return (
     <section className="flex flex-col gap-6">
@@ -79,17 +90,19 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="rounded-full bg-primary/90 px-2.5 py-0.5 text-xs font-semibold text-primary-foreground shadow-sm">
-              {chat.chat_id}
+              {chatDisplayName}
             </span>
-            <h1 className="text-lg font-semibold tracking-tight capitalize">
-              {chat.case_type.replace(/_/g, " ")}
-            </h1>
+            {analysis?.intent != null && (
+              <h1 className="text-lg font-semibold tracking-tight capitalize">
+                {String(analysis.intent).replace(/_/g, " ")}
+              </h1>
+            )}
           </div>
-          {chat.scenario && (
+          {scenario?.case_type != null && (
             <p className="text-xs text-muted-foreground">
               Case type:{" "}
               <span className="font-medium capitalize">
-                {chat.scenario.case_type.replace(/_/g, " ")}
+                {String(scenario.case_type).replace(/_/g, " ")}
               </span>
             </p>
           )}
@@ -141,31 +154,37 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
           <h2 className="text-sm font-semibold tracking-tight text-muted-foreground">
             Quality analysis
           </h2>
-          {chat.analysis ? (
+          {analysis ? (
             <>
               <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Intent</span>
-                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium">
-                    {chat.analysis.intent}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">
-                    Satisfaction
-                  </span>
-                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium capitalize">
-                    {chat.analysis.satisfaction}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">
-                    Quality score
-                  </span>
-                  <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium">
-                    {chat.analysis.quality_score} / 10
-                  </span>
-                </div>
+                {analysis.intent != null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Intent</span>
+                    <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium">
+                      {String(analysis.intent)}
+                    </span>
+                  </div>
+                )}
+                {analysis.satisfaction != null && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      Satisfaction
+                    </span>
+                    <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium capitalize">
+                      {String(analysis.satisfaction)}
+                    </span>
+                  </div>
+                )}
+                {typeof analysis.quality_score === "number" && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      Quality score
+                    </span>
+                    <span className="rounded-full bg-secondary px-2 py-0.5 text-xs font-medium">
+                      {analysis.quality_score} / 10
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -194,11 +213,17 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
                 <span className="text-xs font-medium text-muted-foreground">
                   Agent mistakes
                 </span>
-                {chat.analysis.agent_mistakes.length ? (
+                {Array.isArray(analysis.agent_mistakes) &&
+                analysis.agent_mistakes.length > 0 ? (
                   <ul className="list-disc space-y-0.5 pl-4 text-xs text-muted-foreground">
-                    {chat.analysis.agent_mistakes.map((m, i) => (
+                    {(analysis.agent_mistakes as Array<{
+                      type?: string
+                      description?: string
+                      message_index?: number
+                    }>).map((m, i) => (
                       <li key={i}>
-                        <span className="capitalize">{m.type}</span>: {m.description}
+                        <span className="capitalize">{m.type ?? "—"}</span>:{" "}
+                        {m.description ?? ""}
                         {typeof m.message_index === "number" && (
                           <> (message #{m.message_index + 1})</>
                         )}
@@ -217,13 +242,15 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
                   Reasoning
                 </span>
                 <p className="text-xs text-muted-foreground">
-                  {chat.analysis.reasoning}
+                  {typeof analysis.reasoning === "string"
+                    ? analysis.reasoning
+                    : "—"}
                 </p>
               </div>
             </>
           ) : (
             <p className="text-xs text-muted-foreground">
-              Analysis not yet available ({chat.status}).
+              Analysis not yet available ({String(chat.status)}).
             </p>
           )}
         </aside>

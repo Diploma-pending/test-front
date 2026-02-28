@@ -21,36 +21,11 @@ export type ChatStatus =
   | "analyzed"
   | "failed"
 
-export type CaseType =
-  | "simple_resolved"
-  | "complex_resolved"
-  | "escalated"
-  | "unresolved"
-
-export type Satisfaction = "satisfied" | "neutral" | "unsatisfied"
-
-export type AgentMistakeType = "tonal" | "logical"
-
-export interface AgentMistake {
-  type: AgentMistakeType
-  description: string
-  message_index: number
-}
-
-export interface ChatAnalysis {
-  chat_id: string
-  intent: string
-  satisfaction: Satisfaction
-  quality_score: number
-  agent_mistakes: AgentMistake[]
-  reasoning: string
-}
-
+/** Chat summary from GET /groups/{group_id}/chats */
 export interface ChatSummary {
   chat_id: string
-  case_type: CaseType
   status: ChatStatus
-  analysis: ChatAnalysis | null
+  analysis?: Record<string, unknown> | null
 }
 
 export interface GroupChatsResponse {
@@ -59,40 +34,45 @@ export interface GroupChatsResponse {
   status: GroupStatus
   num_chats: number
   created_at: string
-  website_url: string | null
-  context_gathering_error: string | null
   chats: ChatSummary[]
+  website_url?: string | null
+  context_gathering_error?: string | null
+  business?: string | null
 }
 
-export interface Message {
-  role: "customer" | "agent"
-  text: string
+/** Message in chat detail; API returns objects with arbitrary shape */
+export interface ChatMessageRecord {
+  role?: "customer" | "agent"
+  text?: string
+  [key: string]: unknown
 }
 
-export interface Scenario {
-  domain: string
-  case_type: CaseType
-  has_hidden_dissatisfaction: boolean
-  has_tonal_errors: boolean
-  has_logical_errors: boolean
-}
-
+/** Full chat detail from GET /groups/{group_id}/chats/{chat_id} */
 export interface ChatDetailResponse {
   chat_id: string
-  case_type: CaseType
   status: ChatStatus
-  messages: Message[] | null
-  scenario: Scenario | null
-  analysis: ChatAnalysis | null
+  messages?: ChatMessageRecord[] | null
+  analysis?: Record<string, unknown> | null
 }
 
-export interface CreateGroupResponse {
+export interface GroupSummary {
+  group_id: string
+  topic: string
+  status: GroupStatus
+  num_chats: number
+  created_at: string
+  website_url?: string | null
+  context_gathering_error?: string | null
+  business?: string | null
+}
+
+export interface GroupCreateResponse {
   group_id: string
   status: GroupStatus
   num_chats: number
 }
 
-export interface TriggerAnalysisResponse {
+export interface GroupAnalyzeResponse {
   group_id: string
   status: GroupStatus
 }

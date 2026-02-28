@@ -1,8 +1,14 @@
 import { Outlet, createRootRoute } from "@tanstack/react-router"
 import { AppHeader } from "@/widgets/layout/app-header"
+import { ErrorPage } from "@/pages/error-page"
+import { NotFoundPage } from "@/pages/not-found-page"
 
 export const Route = createRootRoute({
   component: RootLayout,
+  notFoundComponent: NotFoundPage,
+  errorComponent: ({ error, reset }) => (
+    <ErrorPage error={error} reset={reset} />
+  ),
 })
 
 function RootLayout() {

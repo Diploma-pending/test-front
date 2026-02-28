@@ -1,6 +1,13 @@
 import { useState } from "react"
 import { useNavigate } from "@tanstack/react-router"
 import { Button } from "@/shared/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/ui/select"
 import { useBusinesses, useCreateGroup } from "../api/queries"
 
 const MAX_FILE_SIZE = 1024 * 1024 // 1 MB
@@ -157,20 +164,22 @@ export const GroupCreateForm = () => {
           <label htmlFor="business" className="block text-sm font-medium">
             Business context
           </label>
-          <select
-            id="business"
+          <Select
             value={selectedBusinessId}
-            onChange={(e) => setSelectedBusinessId(e.target.value)}
+            onValueChange={setSelectedBusinessId}
             disabled={createGroup.isPending || businessesLoading}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            <option value="">Select a business…</option>
-            {businesses.map((b) => (
-              <option key={b.id} value={b.id}>
-                {b.label}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger id="business" className="w-full">
+              <SelectValue placeholder="Select a business…" />
+            </SelectTrigger>
+            <SelectContent>
+              {businesses.map((b) => (
+                <SelectItem key={b.id} value={b.id}>
+                  {b.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <p className="text-xs text-muted-foreground">
             Use a preset context from the list (e.g. Brighterly, Dressly).
           </p>

@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "pnpm run build && wrangler dev",
+    "preview:quiet": "pnpm run build && WRANGLER_LOG=warn wrangler dev",
     "tsr:generate": "tsr generate",
     "deploy": "pnpm run build && wrangler deploy"
   },

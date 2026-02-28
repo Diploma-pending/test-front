@@ -1,0 +1,1 @@
+This folder contains the built output assets for the worker "test-front" generated at 2026-02-28T15:41:26.508Z.
