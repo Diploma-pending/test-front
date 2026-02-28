@@ -6,8 +6,7 @@ import type {
   TriggerAnalysisResponse,
 } from "./types"
 
-// In dev, use Vite proxy (/api -> localhost:8000) to avoid CORS
-const API_BASE_URL = 'http://20.251.170.183:8000'
+const API_BASE_URL = "https://zackary-oversalty-louie.ngrok-free.dev/docs"
 
 async function handleResponse<T>(res: Response): Promise<T> {
   const text = await res.text()
