@@ -7,9 +7,7 @@ import type {
 } from "./types"
 
 // In dev, use Vite proxy (/api -> localhost:8000) to avoid CORS
-const API_BASE_URL = import.meta.env.DEV
-  ? "/api"
-  : ((import.meta.env.VITE_API_BASE_URL as string) ?? "http://localhost:8000")
+const API_BASE_URL = 'http://20.251.170.183:8000'
 
 async function handleResponse<T>(res: Response): Promise<T> {
   const text = await res.text()
