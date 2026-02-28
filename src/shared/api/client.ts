@@ -4,6 +4,7 @@ import type {
   GroupAnalyzeResponse,
   GroupChatsResponse,
   GroupCreateResponse,
+  GroupSummary,
 } from "./types"
 
 const API_BASE_URL = "https://zackary-oversalty-louie.ngrok-free.dev"
@@ -51,16 +52,14 @@ export async function listBusinesses(): Promise<BusinessContextItem[]> {
 }
 
 export async function createGroup(params: {
-  topic: string
   business?: string
   contextFile?: File
   websiteUrl?: string
   numChats?: number
 }): Promise<GroupCreateResponse> {
-  const { topic, business, contextFile, websiteUrl, numChats = 8 } = params
+  const { business, contextFile, websiteUrl, numChats = 8 } = params
 
   const form = new FormData()
-  form.append("topic", topic)
   if (business) {
     form.append("business", business)
   }
@@ -79,6 +78,13 @@ export async function createGroup(params: {
   })
 
   return handleResponse<GroupCreateResponse>(res)
+}
+
+export async function listGroups(): Promise<GroupSummary[]> {
+  const res = await fetch(`${API_BASE_URL}/groups`, {
+    headers: NGROK_HEADERS,
+  })
+  return handleResponse<GroupSummary[]>(res)
 }
 
 export async function triggerAnalysis(

@@ -8,10 +8,14 @@ import {
   getChatDetail,
   getGroupChats,
   listBusinesses,
+  listGroups,
   triggerAnalysis,
   triggerChatAnalysis,
 } from "@/shared/api/client"
-import type { GroupChatsResponse } from "@/shared/api/types"
+import type {
+  ChatDetailResponse,
+  GroupChatsResponse,
+} from "@/shared/api/types"
 
 const groupChatsKey = (groupId: string) => ["groups", groupId, "chats"] as const
 const chatDetailKey = (groupId: string, chatId: string) =>
@@ -37,12 +41,20 @@ export function useBusinesses() {
   })
 }
 
+export function useGroups() {
+  return useQuery({
+    queryKey: ["groups", "list"] as const,
+    queryFn: listGroups,
+  })
+}
+
 export function useCreateGroup() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: createGroup,
     onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["groups", "list"] })
       queryClient.invalidateQueries({ queryKey: groupChatsKey(data.group_id) })
     },
   })
@@ -86,6 +98,14 @@ export function useGroupChats(groupId: string | undefined) {
   })
 }
 
+const CHAT_ANALYZING_STATUSES = ["analyzing"] as const
+
+function shouldPollChatDetail(status: ChatDetailResponse["status"]) {
+  return CHAT_ANALYZING_STATUSES.includes(
+    status as (typeof CHAT_ANALYZING_STATUSES)[number],
+  )
+}
+
 export function useChatDetail(
   groupId: string | undefined,
   chatId: string | undefined,
@@ -94,5 +114,10 @@ export function useChatDetail(
     queryKey: chatDetailKey(groupId ?? "", chatId ?? ""),
     queryFn: () => getChatDetail(groupId!, chatId!),
     enabled: Boolean(groupId) && Boolean(chatId),
+    refetchInterval: (query) => {
+      const data = query.state.data as ChatDetailResponse | undefined
+      if (!data) return false
+      return shouldPollChatDetail(data.status) ? 3000 : false
+    },
   })
 }

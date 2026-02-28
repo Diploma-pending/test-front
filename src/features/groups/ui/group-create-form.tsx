@@ -30,7 +30,6 @@ export const GroupCreateForm = () => {
   const navigate = useNavigate()
   const createGroup = useCreateGroup()
   const { data: businesses = [], isLoading: businessesLoading } = useBusinesses()
-  const [topic, setTopic] = useState("")
   const [contextMode, setContextMode] = useState<ContextMode>("preset")
   const [selectedBusinessId, setSelectedBusinessId] = useState("")
   const [contextFile, setContextFile] = useState<File | null>(null)
@@ -42,11 +41,6 @@ export const GroupCreateForm = () => {
     e.preventDefault()
     setError(null)
 
-    if (!topic.trim()) {
-      setError("Topic is required")
-      return
-    }
-
     if (contextMode === "preset") {
       if (!selectedBusinessId) {
         setError("Select a business context")
@@ -54,7 +48,6 @@ export const GroupCreateForm = () => {
       }
       createGroup.mutate(
         {
-          topic: topic.trim(),
           business: selectedBusinessId,
           numChats,
         },
@@ -94,7 +87,6 @@ export const GroupCreateForm = () => {
 
     createGroup.mutate(
       {
-        topic: topic.trim(),
         business: "custom",
         ...(hasFile && contextFile && { contextFile }),
         ...(hasUrl && { websiteUrl: websiteUrl.trim() }),
@@ -116,21 +108,6 @@ export const GroupCreateForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-xl">
-      <div className="space-y-2">
-        <label htmlFor="topic" className="block text-sm font-medium">
-          Topic
-        </label>
-        <input
-          id="topic"
-          type="text"
-          value={topic}
-          onChange={(e) => setTopic(e.target.value)}
-          placeholder="e.g. e-commerce platform"
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          disabled={createGroup.isPending}
-        />
-      </div>
-
       <div className="space-y-2">
         <span className="block text-sm font-medium">Context</span>
         <div className="flex gap-4">
@@ -215,7 +192,7 @@ export const GroupCreateForm = () => {
               disabled={createGroup.isPending}
             />
             <p className="text-xs text-muted-foreground">
-              For custom context: provide a .md file and/or website URL, or leave both empty to use topic only (backend will resolve).
+              For custom context: provide a .md file and/or website URL, or leave both empty and the backend will resolve context.
             </p>
           </div>
         </>

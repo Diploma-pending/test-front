@@ -13,8 +13,9 @@ function GroupCreatePage() {
           Create chat analysis group
         </h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          Upload a topic and context file to generate AI support chats. After
-          generation, run analysis to get quality scores and insights.
+          Choose a business context or upload a context file to generate AI
+          support chats. After generation, run analysis to get quality scores
+          and insights.
         </p>
       </header>
       <GroupCreateForm />
