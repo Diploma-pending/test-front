@@ -1,2 +1,6 @@
 export { ErrorPage } from "./error-page"
 export { NotFoundPage } from "./not-found-page"
+export { GroupCreatePage } from "./group-create-page"
+export { GroupsListPage } from "./groups-list-page"
+export { GroupChatsListPage } from "./group-chats-list-page"
+export { GroupChatDetailPage } from "./group-chat-detail-page"

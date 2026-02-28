@@ -10,23 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/select"
-import { useBusinesses, useCreateGroup } from "../api/queries"
-
-const MAX_FILE_SIZE = 1024 * 1024 // 1 MB
+import { useBusinesses, useCreateGroup } from "../hooks/use-groups-queries"
+import { MAX_CONTEXT_FILE_SIZE_BYTES } from "../lib/constants"
+import { isValidHttpUrl } from "../lib/utils"
 
 type ContextMode = "preset" | "custom"
-
-function isValidHttpUrl(str: string): boolean {
-  try {
-    const url = new URL(str)
-    return (
-      (url.protocol === "http:" || url.protocol === "https:") &&
-      Boolean(url.hostname)
-    )
-  } catch {
-    return false
-  }
-}
 
 export const GroupCreateForm = () => {
   const navigate = useNavigate()
@@ -39,7 +27,7 @@ export const GroupCreateForm = () => {
   const [numChats, setNumChats] = useState(8)
   const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
@@ -76,7 +64,7 @@ export const GroupCreateForm = () => {
         setError("Context file must be a .md file")
         return
       }
-      if (contextFile.size > MAX_FILE_SIZE) {
+      if (contextFile.size > MAX_CONTEXT_FILE_SIZE_BYTES) {
         setError("Context file must be ≤ 1 MB")
         return
       }
@@ -109,7 +97,7 @@ export const GroupCreateForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-xl">
+    <form onSubmit={onSubmit} className="flex flex-col gap-4 max-w-xl">
       <div className="space-y-2">
         <span className="block text-sm font-medium">Context</span>
         <div className="flex gap-4">

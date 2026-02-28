@@ -1,7 +1,11 @@
 import { createFileRoute, notFound } from "@tanstack/react-router"
-import { ApiError } from "@/shared/api/client"
-import { getGroupChats } from "@/shared/api/client"
-import { GroupChatsList } from "@/features/groups/ui/group-chats-list"
+import { ApiError, getGroupChats } from "@/shared/api/client"
+import { GroupChatsListPage } from "@/pages/group-chats-list-page"
+
+const GroupChatsListRoute = () => {
+  const { groupId } = Route.useParams()
+  return <GroupChatsListPage groupId={groupId} />
+}
 
 export const Route = createFileRoute("/groups/$groupId/")({
   loader: async ({ params }) => {
@@ -14,10 +18,5 @@ export const Route = createFileRoute("/groups/$groupId/")({
       throw err
     }
   },
-  component: GroupChatsListPage,
+  component: GroupChatsListRoute,
 })
-
-function GroupChatsListPage() {
-  const { groupId } = Route.useParams()
-  return <GroupChatsList groupId={groupId} />
-}

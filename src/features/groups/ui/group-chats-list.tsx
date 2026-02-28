@@ -2,34 +2,11 @@ import { Link } from "@tanstack/react-router"
 import { ApiError } from "@/shared/api/client"
 import { getChatDisplayName } from "@/shared/lib/utils"
 import { Button } from "@/shared/ui/button"
-import { useGroupChats, useTriggerAnalysis } from "../api/queries"
-import type { GroupStatus } from "@/shared/api/types"
+import { useGroupChats, useTriggerAnalysis } from "../hooks/use-groups-queries"
+import { getGroupStatusMessage } from "../lib/utils"
 
-interface GroupChatsListProps {
+type GroupChatsListProps = {
   groupId: string
-}
-
-function getStatusMessage(status: GroupStatus): string {
-  switch (status) {
-    case "gathering_context":
-      return "Fetching website and generating context…"
-    case "context_gathering_failed":
-      return "Context gathering failed."
-    case "generating":
-      return "Generating chats…"
-    case "generated":
-      return "All chats generated. Run analysis to continue."
-    case "generation_failed":
-      return "Generation failed."
-    case "analyzing":
-      return "Analyzing chats…"
-    case "completed":
-      return "Analysis complete."
-    case "analysis_failed":
-      return "Analysis failed."
-    default:
-      return ""
-  }
 }
 
 export const GroupChatsList = ({ groupId }: GroupChatsListProps) => {
@@ -65,9 +42,7 @@ export const GroupChatsList = ({ groupId }: GroupChatsListProps) => {
     )
   }
 
-  if (!data) {
-    return null
-  }
+  if (!data) return null
 
   const isFailed =
     data.status === "context_gathering_failed" ||
@@ -103,7 +78,7 @@ export const GroupChatsList = ({ groupId }: GroupChatsListProps) => {
 
       {isFailed && (
         <div className="rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive animate-fade-in transition-colors duration-200">
-          <p>{getStatusMessage(data.status)}</p>
+          <p>{getGroupStatusMessage(data.status)}</p>
           {data.status === "context_gathering_failed" &&
             data.context_gathering_error && (
               <p className="mt-2 text-xs opacity-90">

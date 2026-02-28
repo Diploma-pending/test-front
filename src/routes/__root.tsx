@@ -3,15 +3,7 @@ import { AppHeader } from "@/widgets/layout/app-header"
 import { ErrorPage } from "@/pages/error-page"
 import { NotFoundPage } from "@/pages/not-found-page"
 
-export const Route = createRootRoute({
-  component: RootLayout,
-  notFoundComponent: NotFoundPage,
-  errorComponent: ({ error, reset }) => (
-    <ErrorPage error={error} reset={reset} />
-  ),
-})
-
-function RootLayout() {
+const RootLayout = () => {
   const location = useLocation()
   return (
     <div className="min-h-svh bg-background text-foreground">
@@ -27,4 +19,12 @@ function RootLayout() {
     </div>
   )
 }
+
+export const Route = createRootRoute({
+  component: RootLayout,
+  notFoundComponent: NotFoundPage,
+  errorComponent: ({ error, reset }) => (
+    <ErrorPage error={error} reset={reset} />
+  ),
+})
 

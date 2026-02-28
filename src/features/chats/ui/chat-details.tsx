@@ -6,9 +6,9 @@ import {
   useChatDetail,
   useGroupChats,
   useTriggerChatAnalysis,
-} from "@/features/groups/api/queries"
+} from "@/features/groups/hooks/use-groups-queries"
 
-interface ChatDetailsPageProps {
+type ChatDetailsPageProps = {
   groupId: string
   chatId: string
 }
