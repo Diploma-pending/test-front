@@ -8,9 +8,17 @@ import type {
 
 const API_BASE_URL = "https://zackary-oversalty-louie.ngrok-free.dev"
 
-// ngrok free tier shows an interstitial unless this header is sent
 const NGROK_HEADERS: HeadersInit = {
   "ngrok-skip-browser-warning": "true",
+}
+
+export class ApiError extends Error {
+  readonly status: number
+  constructor(message: string, status: number) {
+    super(message)
+    this.name = "ApiError"
+    this.status = status
+  }
 }
 
 async function handleResponse<T>(res: Response): Promise<T> {
@@ -27,9 +35,9 @@ async function handleResponse<T>(res: Response): Promise<T> {
       typeof body === "object" && body !== null && "detail" in body
         ? (body as { detail: unknown }).detail
         : res.statusText
-    throw new Error(
-      typeof detail === "string" ? detail : JSON.stringify(detail),
-    )
+    const message =
+      typeof detail === "string" ? detail : JSON.stringify(detail)
+    throw new ApiError(message, res.status)
   }
 
   return body as T

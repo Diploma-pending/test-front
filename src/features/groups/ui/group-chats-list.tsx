@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router"
+import { ApiError } from "@/shared/api/client"
 import { Button } from "@/shared/ui/button"
 import { useGroupChats, useTriggerAnalysis } from "../api/queries"
 import type { GroupStatus } from "@/shared/api/types"
@@ -43,6 +44,19 @@ export const GroupChatsList = ({ groupId }: GroupChatsListProps) => {
   }
 
   if (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return (
+        <div className="flex flex-col items-center gap-4 py-12 text-center">
+          <p className="text-lg font-medium">Group not found</p>
+          <p className="max-w-sm text-sm text-muted-foreground">
+            This group doesn't exist or you don't have access to it.
+          </p>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/">Back to home</Link>
+          </Button>
+        </div>
+      )
+    }
     return (
       <div className="rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
         {error instanceof Error ? error.message : String(error)}

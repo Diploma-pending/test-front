@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router"
+import { ApiError } from "@/shared/api/client"
 import { Button } from "@/shared/ui/button"
 import { useChatDetail } from "@/features/groups/api/queries"
 
@@ -19,6 +20,21 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
   }
 
   if (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      return (
+        <div className="flex flex-col items-center gap-4 py-12 text-center">
+          <p className="text-lg font-medium">Chat not found</p>
+          <p className="max-w-sm text-sm text-muted-foreground">
+            This chat doesn't exist or you don't have access to it.
+          </p>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/groups/$groupId" params={{ groupId }}>
+              Back to list
+            </Link>
+          </Button>
+        </div>
+      )
+    }
     return (
       <div className="space-y-4">
         <p className="text-sm text-destructive">
@@ -35,8 +51,11 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
 
   if (!chat) {
     return (
-      <div className="space-y-4">
-        <p className="text-sm text-muted-foreground">Chat not found.</p>
+      <div className="flex flex-col items-center gap-4 py-12 text-center">
+        <p className="text-lg font-medium">Chat not found</p>
+        <p className="max-w-sm text-sm text-muted-foreground">
+          This chat doesn't exist or you don't have access to it.
+        </p>
         <Button asChild variant="outline" size="sm">
           <Link to="/groups/$groupId" params={{ groupId }}>
             Back to list
