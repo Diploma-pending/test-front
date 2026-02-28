@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router"
 
 export const AppHeader = () => (
-  <header className="flex items-center justify-between max-w-6xl mx-auto px-6 py-4 border-b border-border bg-background/90">
+  <header className="flex items-center justify-between max-w-6xl mx-auto p-4 border-b border-border bg-background/90">
     <div className="flex items-center gap-2">
       <span className="text-xl font-semibold tracking-tight">AI Support Chats</span>
     </div>

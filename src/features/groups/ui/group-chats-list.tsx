@@ -2,8 +2,13 @@ import { Link } from "@tanstack/react-router"
 import { ApiError } from "@/shared/api/client"
 import { getChatDisplayName } from "@/shared/lib/utils"
 import { Button } from "@/shared/ui/button"
+import { cn } from "@/shared/lib/styles"
 import { useGroupChats, useTriggerAnalysis } from "../hooks/use-groups-queries"
-import { getGroupStatusMessage } from "../lib/utils"
+import {
+  formatStatusLabel,
+  getChatStatusBadgeClassName,
+  getGroupStatusMessage,
+} from "../lib/utils"
 
 type GroupChatsListProps = {
   groupId: string
@@ -136,8 +141,13 @@ export const GroupChatsList = ({ groupId }: GroupChatsListProps) => {
                       {getChatDisplayName(index + 1)}
                     </span>
                     <div className="flex flex-wrap items-center justify-end gap-1.5">
-                      <span className="rounded-lg bg-secondary/80 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                        {chat.status.replace(/_/g, " ")}
+                      <span
+                        className={cn(
+                          "rounded-lg px-2 py-0.5 text-[11px] font-medium",
+                          getChatStatusBadgeClassName(chat.status),
+                        )}
+                      >
+                        {formatStatusLabel(chat.status)}
                       </span>
                       {chat.analysis &&
                         typeof chat.analysis.quality_score === "number" && (

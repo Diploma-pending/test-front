@@ -5,16 +5,12 @@ import { ApiError } from "@/shared/api/client"
 import { Button } from "@/shared/ui/button"
 import { useGroups, useBusinesses } from "@/features/groups/hooks/use-groups-queries"
 import { BusinessIcon } from "@/features/groups/ui/business-icon"
-import { formatGroupDateList, getStatusBadgeVariant } from "@/features/groups/lib/utils"
+import {
+  formatGroupDateList,
+  formatStatusLabel,
+  getStatusBadgeClassName,
+} from "@/features/groups/lib/utils"
 import { cn } from "@/shared/lib/styles"
-import type { GroupStatus } from "@/shared/api/types"
-
-const getStatusBadgeClassName = (status: GroupStatus): string => {
-  const variant = getStatusBadgeVariant(status)
-  if (variant === "destructive") return "bg-destructive/15 text-destructive"
-  if (variant === "default") return "bg-primary/15 text-primary"
-  return "bg-secondary text-secondary-foreground"
-}
 
 export const GroupsListPage = () => {
   const [businessFilter, setBusinessFilter] = useState<string>("")
@@ -148,7 +144,7 @@ export const GroupsListPage = () => {
                           getStatusBadgeClassName(group.status),
                         )}
                       >
-                        {group.status.replace(/_/g, " ")}
+                        {formatStatusLabel(group.status)}
                       </span>
                     </div>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">

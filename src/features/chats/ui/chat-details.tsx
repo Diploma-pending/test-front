@@ -7,6 +7,7 @@ import {
   useGroupChats,
   useTriggerChatAnalysis,
 } from "@/features/groups/hooks/use-groups-queries"
+import { formatStatusLabel } from "@/features/groups/lib/utils"
 
 type ChatDetailsPageProps = {
   groupId: string
@@ -267,7 +268,7 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
             </>
           ) : (
             <p className="text-xs text-muted-foreground">
-              Analysis not yet available ({String(chat.status)}).
+              Analysis not yet available ({formatStatusLabel(chat.status)}).
             </p>
           )}
         </aside>
