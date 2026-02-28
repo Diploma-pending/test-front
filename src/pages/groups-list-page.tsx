@@ -140,7 +140,7 @@ export const GroupsListPage = () => {
                       </h2>
                       <span
                         className={cn(
-                          "shrink-0 rounded-full px-2 py-0.5 text-xs font-medium",
+                          "shrink-0 rounded-lg px-2 py-0.5 text-xs font-medium",
                           getStatusBadgeClassName(group.status),
                         )}
                       >
