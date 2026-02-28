@@ -69,15 +69,24 @@ export const useTriggerAnalysis = (groupId: string) => {
   })
 }
 
+const invalidateChatAndChats = (
+  queryClient: ReturnType<typeof useQueryClient>,
+  groupId: string,
+  chatId: string,
+) => {
+  queryClient.invalidateQueries({ queryKey: groupChatsKey(groupId) })
+  queryClient.invalidateQueries({ queryKey: chatDetailKey(groupId, chatId) })
+}
+
 export const useTriggerChatAnalysis = (groupId: string, chatId: string) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: () => triggerChatAnalysis(groupId, chatId),
+    onMutate: () => {
+      invalidateChatAndChats(queryClient, groupId, chatId)
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: groupChatsKey(groupId) })
-      queryClient.invalidateQueries({
-        queryKey: chatDetailKey(groupId, chatId),
-      })
+      invalidateChatAndChats(queryClient, groupId, chatId)
     },
   })
 }
@@ -86,11 +95,11 @@ export const useTriggerChatRegenerate = (groupId: string, chatId: string) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: () => regenerateChat(groupId, chatId),
+    onMutate: () => {
+      invalidateChatAndChats(queryClient, groupId, chatId)
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: groupChatsKey(groupId) })
-      queryClient.invalidateQueries({
-        queryKey: chatDetailKey(groupId, chatId),
-      })
+      invalidateChatAndChats(queryClient, groupId, chatId)
     },
   })
 }
