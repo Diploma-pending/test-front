@@ -6,7 +6,7 @@ import type {
   TriggerAnalysisResponse,
 } from "./types"
 
-const API_BASE_URL = "https://zackary-oversalty-louie.ngrok-free.dev/docs"
+const API_BASE_URL = "https://zackary-oversalty-louie.ngrok-free.dev"
 
 async function handleResponse<T>(res: Response): Promise<T> {
   const text = await res.text()
