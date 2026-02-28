@@ -80,7 +80,7 @@ function GroupsListPage() {
       </header>
 
       {list.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 rounded-xl border border-border bg-card/50 py-12 text-center">
+        <div className="flex flex-col items-center gap-4 rounded-xl border border-border bg-card/50 py-12 text-center animate-fade-in">
           <p className="text-muted-foreground">No groups yet.</p>
           <Button asChild variant="outline" size="sm">
             <Link to="/">Create your first group</Link>
@@ -93,7 +93,7 @@ function GroupsListPage() {
               <Link
                 to="/groups/$groupId"
                 params={{ groupId: group.group_id }}
-                className="flex flex-col gap-2 rounded-xl border border-border bg-card/70 p-4 shadow-sm transition-colors hover:bg-secondary/50 hover:border-primary/30"
+                className="flex flex-col gap-2 rounded-xl border border-border bg-card/70 p-4 shadow-sm transition-[color,background-color,border-color,box-shadow] duration-200 ease-out hover:bg-secondary/50 hover:border-primary/30 hover:shadow-md"
               >
                 <div className="flex items-start justify-between gap-2">
                   <h2 className="font-medium leading-tight line-clamp-2">

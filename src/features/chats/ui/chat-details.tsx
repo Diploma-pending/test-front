@@ -90,7 +90,7 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
   )
 
   return (
-    <section className="flex flex-col gap-6">
+    <section className="flex flex-col gap-6 animate-fade-in">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
           <div className="flex items-center gap-2">

@@ -102,7 +102,7 @@ export const GroupChatsList = ({ groupId }: GroupChatsListProps) => {
       </header>
 
       {isFailed && (
-        <div className="rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div className="rounded-md bg-destructive/10 px-4 py-3 text-sm text-destructive animate-fade-in transition-colors duration-200">
           <p>{getStatusMessage(data.status)}</p>
           {data.status === "context_gathering_failed" &&
             data.context_gathering_error && (
@@ -114,7 +114,7 @@ export const GroupChatsList = ({ groupId }: GroupChatsListProps) => {
       )}
 
       {isInProgress && (
-        <div className="rounded-md bg-secondary/50 px-4 py-2 text-sm text-muted-foreground">
+        <div className="rounded-md bg-secondary/50 px-4 py-2 text-sm text-muted-foreground animate-fade-in transition-colors duration-200">
           {data.status === "gathering_context"
             ? "Fetching website and generating context document…"
             : data.status === "generating"
@@ -124,7 +124,7 @@ export const GroupChatsList = ({ groupId }: GroupChatsListProps) => {
       )}
 
       {canAnalyze && (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 animate-fade-in transition-opacity duration-200">
           <Button
             onClick={() => triggerAnalysis.mutate()}
             disabled={triggerAnalysis.isPending}
@@ -134,57 +134,62 @@ export const GroupChatsList = ({ groupId }: GroupChatsListProps) => {
         </div>
       )}
 
-      <div className="rounded-xl border border-border bg-card/70 shadow-sm">
-        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
           <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Chats ({data.chats.length} / {data.num_chats})
           </span>
         </div>
 
-        <ul className="divide-y divide-border">
-          {data.chats.length === 0 ? (
-            <li className="px-4 py-8 text-center text-sm text-muted-foreground">
-              {data.status === "gathering_context"
-                ? "Fetching website and generating context…"
-                : "No chats yet. Generation in progress…"}
-            </li>
-          ) : (
-            data.chats.map((chat, index) => (
-              <li key={chat.chat_id} className="group">
+        {data.chats.length === 0 ? (
+          <div className="rounded-2xl border border-border bg-card/50 py-16 text-center text-sm text-muted-foreground">
+            {data.status === "gathering_context"
+              ? "Fetching website and generating context…"
+              : "No chats yet. Generation in progress…"}
+          </div>
+        ) : (
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {data.chats.map((chat, index) => (
+              <li key={chat.chat_id}>
                 <Link
                   to="/groups/$groupId/chats/$chatId"
                   params={{ groupId, chatId: chat.chat_id }}
-                  className="flex flex-col gap-2 px-4 py-3 transition-colors hover:bg-secondary/60"
+                  className="group flex h-full flex-col rounded-2xl border border-border bg-card/80 p-4 shadow-sm ring-1 ring-black/5 transition-all duration-200 ease-out hover:border-primary/20 hover:bg-card hover:shadow-md hover:ring-primary/10"
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-full bg-primary/90 px-2.5 py-0.5 text-xs font-semibold text-primary-foreground shadow-sm">
-                        {getChatDisplayName(index + 1)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span className="rounded-full bg-secondary px-2 py-0.5">
-                        {chat.status}
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="rounded-xl bg-primary/90 px-3 py-1.5 text-sm font-semibold text-primary-foreground shadow-sm">
+                      {getChatDisplayName(index + 1)}
+                    </span>
+                    <div className="flex flex-wrap items-center justify-end gap-1.5">
+                      <span className="rounded-lg bg-secondary/80 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                        {chat.status.replace(/_/g, " ")}
                       </span>
                       {chat.analysis &&
                         typeof chat.analysis.quality_score === "number" && (
-                          <span className="rounded-full bg-secondary px-2 py-0.5">
-                            score {chat.analysis.quality_score}/10
+                          <span className="rounded-lg bg-primary/15 px-2 py-0.5 text-[11px] font-semibold text-primary">
+                            {chat.analysis.quality_score}/10
                           </span>
                         )}
                     </div>
                   </div>
                   {chat.analysis &&
-                    typeof chat.analysis.reasoning === "string" && (
-                      <p className="line-clamp-2 text-xs text-muted-foreground">
-                        {chat.analysis.reasoning}
-                      </p>
-                    )}
+                  typeof chat.analysis.reasoning === "string" ? (
+                    <p className="mt-3 line-clamp-3 flex-1 text-xs leading-relaxed text-muted-foreground">
+                      {chat.analysis.reasoning}
+                    </p>
+                  ) : (
+                    <p className="mt-3 flex-1 text-xs italic text-muted-foreground/70">
+                      No analysis yet
+                    </p>
+                  )}
+                  <span className="mt-3 inline-flex items-center text-[11px] font-medium text-primary opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                    View details →
+                  </span>
                 </Link>
               </li>
-            ))
-          )}
-        </ul>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   )
