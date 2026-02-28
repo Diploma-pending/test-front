@@ -11,6 +11,7 @@ import {
   listGroups,
   triggerAnalysis,
   triggerChatAnalysis,
+  regenerateChat,
 } from "@/shared/api/client"
 import type {
   ChatDetailResponse,
@@ -72,6 +73,19 @@ export const useTriggerChatAnalysis = (groupId: string, chatId: string) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: () => triggerChatAnalysis(groupId, chatId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: groupChatsKey(groupId) })
+      queryClient.invalidateQueries({
+        queryKey: chatDetailKey(groupId, chatId),
+      })
+    },
+  })
+}
+
+export const useTriggerChatRegenerate = (groupId: string, chatId: string) => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => regenerateChat(groupId, chatId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: groupChatsKey(groupId) })
       queryClient.invalidateQueries({

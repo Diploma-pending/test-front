@@ -10,4 +10,5 @@ export {
   getGroupChats,
   getChatDetail,
   triggerChatAnalysis,
+  regenerateChat,
 } from "./services"

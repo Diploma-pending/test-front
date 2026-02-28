@@ -6,6 +6,7 @@ import {
   useChatDetail,
   useGroupChats,
   useTriggerChatAnalysis,
+  useTriggerChatRegenerate,
 } from "@/features/groups/hooks/use-groups-queries"
 import { formatStatusLabel } from "@/features/groups/lib/utils"
 
@@ -18,6 +19,7 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
   const { data: chat, isLoading, error } = useChatDetail(groupId, chatId)
   const { data: groupData } = useGroupChats(groupId)
   const triggerChatAnalysis = useTriggerChatAnalysis(groupId, chatId)
+  const triggerChatRegenerate = useTriggerChatRegenerate(groupId, chatId)
   const chatIndex =
     groupData?.chats.findIndex((c) => c.chat_id === chatId) ?? -1
   const chatDisplayName =
@@ -114,7 +116,19 @@ export const ChatDetailsPage = ({ groupId, chatId }: ChatDetailsPageProps) => {
           )}
         </div>
         <div className="flex items-center gap-2">
-          {(chat.status === "generated" || chat.status === "failed") && (
+          {chat.status === "failed" && (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => triggerChatRegenerate.mutate()}
+              disabled={triggerChatRegenerate.isPending}
+            >
+              {triggerChatRegenerate.isPending
+                ? "Regenerating…"
+                : "Regenerate chat"}
+            </Button>
+          )}
+          {chat.status === "generated" && (
             <Button
               size="sm"
               variant="secondary"

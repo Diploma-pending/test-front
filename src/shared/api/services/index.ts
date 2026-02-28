@@ -5,4 +5,8 @@ export {
   triggerAnalysis,
   getGroupChats,
 } from "./groups"
-export { getChatDetail, triggerChatAnalysis } from "./chats"
+export {
+  getChatDetail,
+  triggerChatAnalysis,
+  regenerateChat,
+} from "./chats"

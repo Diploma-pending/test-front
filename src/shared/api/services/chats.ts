@@ -17,3 +17,12 @@ export const triggerChatAnalysis = (
     `/groups/${groupId}/chats/${encodeURIComponent(chatId)}/analyze`,
     { method: "POST" },
   )
+
+export const regenerateChat = (
+  groupId: string,
+  chatId: string,
+): Promise<ChatDetailResponse> =>
+  request<ChatDetailResponse>(
+    `/groups/${groupId}/chats/${encodeURIComponent(chatId)}/regenerate`,
+    { method: "POST" },
+  )
