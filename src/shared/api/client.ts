@@ -8,6 +8,11 @@ import type {
 
 const API_BASE_URL = "https://zackary-oversalty-louie.ngrok-free.dev"
 
+// ngrok free tier shows an interstitial unless this header is sent
+const NGROK_HEADERS: HeadersInit = {
+  "ngrok-skip-browser-warning": "true",
+}
+
 async function handleResponse<T>(res: Response): Promise<T> {
   const text = await res.text()
   let body: unknown
@@ -31,7 +36,9 @@ async function handleResponse<T>(res: Response): Promise<T> {
 }
 
 export async function listBusinesses(): Promise<BusinessContextItem[]> {
-  const res = await fetch(`${API_BASE_URL}/groups/businesses`)
+  const res = await fetch(`${API_BASE_URL}/groups/businesses`, {
+    headers: NGROK_HEADERS,
+  })
   return handleResponse<BusinessContextItem[]>(res)
 }
 
@@ -59,6 +66,7 @@ export async function createGroup(params: {
 
   const res = await fetch(`${API_BASE_URL}/groups`, {
     method: "POST",
+    headers: NGROK_HEADERS,
     body: form,
   })
 
@@ -70,6 +78,7 @@ export async function triggerAnalysis(
 ): Promise<TriggerAnalysisResponse> {
   const res = await fetch(`${API_BASE_URL}/groups/${groupId}/analyze`, {
     method: "POST",
+    headers: NGROK_HEADERS,
   })
 
   return handleResponse<TriggerAnalysisResponse>(res)
@@ -78,7 +87,9 @@ export async function triggerAnalysis(
 export async function getGroupChats(
   groupId: string,
 ): Promise<GroupChatsResponse> {
-  const res = await fetch(`${API_BASE_URL}/groups/${groupId}/chats`)
+  const res = await fetch(`${API_BASE_URL}/groups/${groupId}/chats`, {
+    headers: NGROK_HEADERS,
+  })
 
   return handleResponse<GroupChatsResponse>(res)
 }
@@ -89,6 +100,7 @@ export async function getChatDetail(
 ): Promise<ChatDetailResponse> {
   const res = await fetch(
     `${API_BASE_URL}/groups/${groupId}/chats/${encodeURIComponent(chatId)}`,
+    { headers: NGROK_HEADERS },
   )
 
   return handleResponse<ChatDetailResponse>(res)
